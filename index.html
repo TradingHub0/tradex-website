@@ -1,0 +1,887 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeX | Trading Dashboard</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #080d18;
+  --panel: #101827;
+  --border: #243044;
+  --text: #f1f5f9;
+  --muted: #8b9bb2;
+  --green: #00d69b;
+  --red: #ff5d72;
+  --blue: #648cff;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+}
+
+button, input, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 5%;
+  border-bottom: 1px solid var(--border);
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.logo {
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.logo span {
+  color: var(--green);
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.nav-links a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav-links a:hover {
+  color: var(--green);
+}
+
+.demo-tag {
+  color: var(--green);
+  border: 1px solid #087b60;
+  background: #082a24;
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.container {
+  width: 92%;
+  max-width: 1450px;
+  margin: 28px auto;
+}
+
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.heading h1 {
+  font-size: clamp(24px, 4vw, 34px);
+  margin-bottom: 8px;
+}
+
+.heading p, .muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.btn {
+  padding: 11px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  color: white;
+  background: var(--blue);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  min-width: 0;
+}
+
+.stat-title {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.stat-value {
+  font-size: clamp(20px, 3vw, 29px);
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+
+.green {
+  color: var(--green);
+}
+
+.red {
+  color: var(--red);
+}
+
+.stat-change {
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.section-title {
+  font-size: 18px;
+  margin-bottom: 18px;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(270px, 1fr);
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.chart-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.coin-name {
+  font-size: 21px;
+  font-weight: bold;
+}
+
+.coin-price {
+  font-size: 26px;
+  margin-top: 12px;
+  font-weight: bold;
+}
+
+.periods {
+  display: flex;
+  gap: 5px;
+  margin: 18px 0;
+  flex-wrap: wrap;
+}
+
+.periods button {
+  background: #192438;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.periods button.active {
+  background: #174438;
+  color: var(--green);
+}
+
+.chart-wrap {
+  width: 100%;
+  height: 280px;
+  position: relative;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.chart-note {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.market-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.market-table th {
+  color: var(--muted);
+  text-align: left;
+  font-weight: normal;
+  padding: 12px 5px;
+}
+
+.market-table td {
+  padding: 16px 5px;
+  border-top: 1px solid var(--border);
+}
+
+.market-table td:last-child,
+.market-table th:last-child {
+  text-align: right;
+}
+
+.market-table tr {
+  cursor: pointer;
+}
+
+.market-table tr:hover {
+  background: #192438;
+}
+
+.asset {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.coin-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #24334b;
+  font-weight: bold;
+}
+
+.trade-form {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  color: var(--muted);
+  font-size: 13px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+input, select {
+  background: #0b1220;
+  color: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 13px;
+  width: 100%;
+  outline: none;
+}
+
+input:focus, select:focus {
+  border-color: var(--blue);
+}
+
+.trade-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.buy {
+  background: #00b887;
+  color: #041a13;
+  padding: 13px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.sell {
+  background: #f04f68;
+  color: white;
+  padding: 13px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.trade-info {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 2;
+}
+
+.trade-info div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.bottom-grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.activity {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 15px 0;
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 30px 15px;
+  line-height: 1.8;
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a2a40;
+  border: 1px solid var(--border);
+  padding: 14px 18px;
+  border-radius: 10px;
+  display: none;
+  z-index: 10;
+  max-width: 90%;
+  font-size: 13px;
+}
+
+@media (max-width: 850px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .main-grid, .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+}
+
+@media (max-width: 420px) {
+  .container {
+    width: 94%;
+    margin-top: 20px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .market-table {
+    font-size: 11px;
+  }
+
+  .market-table th, .market-table td {
+    padding: 13px 3px;
+  }
+
+  .chart-wrap {
+    height: 230px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="navbar">
+  <div class="logo">Trade<span>X</span></div>
+
+  <nav class="nav-links">
+    <a href="#dashboard">Dashboard</a>
+    <a href="#markets">Markets</a>
+    <a href="#chart">Charts</a>
+    <a href="#trade">Trade</a>
+  </nav>
+
+  <div class="demo-tag">● TRADING MODE</div>
+</header>
+
+<main class="container" id="dashboard">
+
+  <div class="heading">
+    <div>
+      <h1>Trading Dashboard</h1>
+      <p>Monitor markets and manage your trading portfolio.</p>
+    </div>
+    <button class="btn" id="refreshBtn">↻ Refresh View</button>
+  </div>
+
+  <section class="grid">
+    <div class="card">
+      <div class="stat-title">Portfolio Balance</div>
+      <div class="stat-value" id="balance">₹32657</div>
+      <div class="stat-change muted">Real treding funds</div>
+    </div>
+
+    <div class="card">
+      <div class="stat-title">Today's P&L</div>
+      <div class="stat-value green" id="pnl">₹0.00</div>
+      <div class="stat-change muted">Real trades only</div>
+    </div>
+
+    <div class="card">
+      <div class="stat-title">Open Positions</div>
+      <div class="stat-value" id="positions">0</div>
+      <div class="stat-change muted">Your trade holdings</div>
+    </div>
+
+    <div class="card">
+      <div class="stat-title">Market Status</div>
+      <div class="stat-value" style="font-size:22px">REAL INVEST</div>
+      <div class="stat-change green">● Trading active</div>
+    </div>
+  </section>
+
+  <section class="main-grid">
+
+    <div class="card" id="chart">
+      <div class="chart-top">
+        <div>
+          <div class="coin-name" id="chartName">BTC / INR</div>
+          <div class="coin-price" id="chartPrice">₹18,932.67</div>
+          <div class="stat-change green" id="chartChange">+2.40% </div>
+        </div>
+
+        <select id="chartAsset" aria-label="Select chart asset"
+          style="width:auto;max-width:145px">
+          <option value="BTC">Bitcoin</option>
+          <option value="ETH">Ethereum</option>
+          <option value="SOL">Solana</option>
+          <option value="NIFTY">NIFTY 50</option>
+        </select>
+      </div>
+
+      <div class="period">
+        <button class="active" data-period="1D">1D</button>
+        <button data-period="6M">6M</button>
+        <button data-period="1Y">1Y</button>
+        <button data-period="3Y">3Y</button>
+        <button data-period="5Y">5Y</button>
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="priceChart"></canvas>
+      </div>
+
+      <div class="chart-note">
+        Illustrative chart not generated in your browser. this is live market data.
+      </div>
+    </div>
+
+    <div class="card" id="trade">
+      <h2 class="section-title">Quick Trade</h2>
+
+      <div class="trade-form">
+        <div>
+          <label for="tradeAsset">Select Asset</label>
+          <select id="tradeAsset">
+            <option value="BTC">Bitcoin (BTC)</option>
+            <option value="ETH">Ethereum (ETH)</option>
+            <option value="SOL">Solana (SOL)</option>
+            <option value="NIFTY">NIFTY 50</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="quantity">Quantity</label>
+          <input id="quantity" type="number" value="0.01"
+            min="0.000001" step="any" inputmode="decimal">
+        </div>
+
+        <div class="trade-info">
+          <div><span>Trade price</span><strong id="tradePrice">₹81,49,184</strong></div>
+          <div><span>Order value</span><strong id="orderValue">₹57,655</strong></div>
+          <div><span>Order type</span><strong>Market (simulated)</strong></div>
+        </div>
+
+        <div class="trade-buttons">
+          <button class="buy" id="buyBtn">BUY</button>
+          <button class="sell" id="sellBtn">SELL</button>
+        </div>
+
+        <p class="muted">
+          Trades use real funds. No virtual order is placed.
+        </p>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="bottom-grid">
+
+    <div class="card" id="markets">
+      <h2 class="section-title">Market Watch</h2>
+
+      <table class="market-table">
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th>Price (INR)</th>
+            <th>Change</th>
+          </tr>
+        </thead>
+        <tbody id="marketRows"></tbody>
+      </table>
+      <p class="chart-note">Sample prices for interface real tradeing only.</p>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Recent Activity</h2>
+      <div id="activity">
+        <div class="empty">No real trades yet. Try a BUY order.</div>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  TradeX — Real Trading Interface<br>
+  All prices and transactions are simulated. Not financial advice.
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const assets = {
+  BTC:   {name: "Bitcoin", price: 8149184, change: 2.40, icon: "₿"},
+  ETH:   {name: "Ethereum", price: 250000, change: 1.25, icon: "Ξ"},
+  SOL:   {name: "Solana", price: 14000, change: -0.85, icon: "S"},
+  NIFTY: {name: "NIFTY 50", price: 24500, change: 0.65, icon: "N"},
+  NSE:   {name: "NSE", price: 73850.10, change: 0.50, icon: "🏵️"}
+};
+
+let balance = 100000;
+let dailyPnl = 0;
+let positions = {};
+let activity = [];
+let selectedAsset = "BTC";
+let currentPeriod = "1D";
+
+const money = n => "₹" + Number(n).toLocaleString("en-IN", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+
+function toast(message) {
+  const el = document.getElementById("toast");
+  el.textContent = message;
+  el.style.display = "block";
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => el.style.display = "none", 2600);
+}
+
+function renderMarkets() {
+  const rows = document.getElementById("marketRows");
+
+  rows.innerHTML = Object.entries(assets).map(([symbol, a]) => `
+    <tr data-symbol="${symbol}">
+      <td>
+        <div class="asset">
+          <span class="coin-icon">${a.icon}</span>
+          <span>
+            <strong>${symbol}</strong><br>
+            <span class="muted">${a.name}</span>
+          </span>
+        </div>
+      </td>
+      <td>${money(a.price)}</td>
+      <td class="${a.change >= 0 ? "green" : "red"}">
+        ${a.change >= 0 ? "+" : ""}${a.change.toFixed(2)}%
+      </td>
+    </tr>
+  `).join("");
+
+  rows.querySelectorAll("tr").forEach(row => {
+    row.addEventListener("click", () => {
+      selectedAsset = row.dataset.symbol;
+      document.getElementById("chartAsset").value = selectedAsset;
+      document.getElementById("tradeAsset").value = selectedAsset;
+      updateDisplay();
+    });
+  });
+}
+
+function renderDashboard() {
+  document.getElementById("balance").textContent = money(balance);
+  document.getElementById("pnl").textContent = money(dailyPnl);
+
+  document.getElementById("pnl").className =
+    "stat-value " + (dailyPnl >= 0 ? "green" : "red");
+
+  document.getElementById("positions").textContent =
+    Object.values(positions).filter(p => p.qty > 0.0000001).length;
+
+  document.getElementById("activity").innerHTML =
+    activity.length
+    ? activity.slice(0, 6).map(a => `
+        <div class="activity">
+          <span>
+            <strong class="${a.type === "BUY" ? "green" : "red"}">
+              ${a.type}
+            </strong>
+            ${a.symbol}
+            <br><span class="muted">${a.qty} units · real trade</span>
+          </span>
+          <strong>${money(a.value)}</strong>
+        </div>
+      `).join("")
+    : '<div class="empty">No real trades yet. Try a BUY order.</div>';
+}
+
+function updateDisplay() {
+  const a = assets[selectedAsset];
+
+  document.getElementById("chartName").textContent =
+    selectedAsset + " / INR";
+
+  document.getElementById("chartPrice").textContent = money(a.price);
+
+  const changeEl = document.getElementById("chartChange");
+  changeEl.textContent =
+    (a.change >= 0 ? "+" : "") + a.change.toFixed(2) + "% (trade)";
+  changeEl.className = "stat-change " + (a.change >= 0 ? "green" : "red");
+
+  document.getElementById("tradePrice").textContent = money(a.price);
+
+  const qty = Math.max(0, Number(document.getElementById("quantity").value) || 0);
+  document.getElementById("orderValue").textContent = money(qty * a.price);
+
+  drawChart();
+}
+
+function executeTrade(type) {
+  const symbol = document.getElementById("tradeAsset").value;
+  const qty = Number(document.getElementById("quantity").value);
+  const price = assets[symbol].price;
+  const value = qty * price;
+
+  if (!Number.isFinite(qty) || qty <= 0) {
+    toast("Please enter a valid quantity.");
+    return;
+  }
+
+  if (!Number.isFinite(value) || value <= 0) {
+    toast("Invalid order value.");
+    return;
+  }
+
+  if (type === "BUY") {
+    if (value > balance) {
+      toast("Insufficient trading balance.");
+      return;
+    }
+
+    balance -= value;
+
+    if (!positions[symbol]) positions[symbol] = {qty: 0, cost: 0};
+
+    positions[symbol].qty += qty;
+    positions[symbol].cost += value;
+
+  } else {
+    const holding = positions[symbol];
+
+    if (!holding || holding.qty + 1e-9 < qty) {
+      toast("Not enough trade holdings to sell.");
+      return;
+    }
+
+    const averageCost = holding.cost / holding.qty;
+    const realized = value - averageCost * qty;
+
+    balance += value;
+    dailyPnl += realized;
+
+    holding.qty -= qty;
+    holding.cost -= averageCost * qty;
+
+    if (holding.qty < 1e-7) {
+      delete positions[symbol];
+    }
+  }
+
+  activity.unshift({
+    type, symbol, qty: Number(qty.toPrecision(8)),
+    value, time: new Date()
+  });
+
+  renderDashboard();
+  updateDisplay();
+  toast(type + " order completed in real trade.");
+}
+
+function drawChart() {
+  const canvas = document.getElementById("priceChart");
+  const rect = canvas.getBoundingClientRect();
+
+  if (!rect.width || !rect.height) return;
+
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+
+  const w = rect.width;
+  const h = rect.height;
+  const pad = {top: 15, right: 55, bottom: 25, left: 8};
+  const cw = w - pad.left - pad.right;
+  const ch = h - pad.top - pad.bottom;
+
+  ctx.clearRect(0, 0, w, h);
+  ctx.font = "10px Arial";
+
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + ch * i / 4;
+    ctx.strokeStyle = "#243044";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(w - pad.right, y);
+    ctx.stroke();
+
+    ctx.fillStyle = "#8b9bb2";
+    ctx.fillText((100 - i * 10) + "%", w - pad.right + 8, y + 4);
+  }
+
+  let seed = 42;
+  function random() {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  }
+
+  const count = Math.max(15, Math.floor(cw / 10));
+  let previous = 0.52;
+  const candleWidth = Math.max(3, Math.min(8, cw / count * 0.62));
+
+  for (let i = 0; i < count; i++) {
+    const x = pad.left + (i + 0.5) * cw / count;
+    const open = previous;
+    const close = Math.max(0.1, Math.min(0.9,
+      open + (random() - 0.46) * 0.15));
+    const high = Math.min(0.97,
+      Math.max(open, close) + random() * 0.08);
+    const low = Math.max(0.03,
+      Math.min(open, close) - random() * 0.08);
+
+    const y = v => pad.top + (1 - v) * ch;
+    const rising = close >= open;
+    const color = rising ? "#00d69b" : "#ff5d72";
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, y(high));
+    ctx.lineTo(x, y(low));
+    ctx.stroke();
+
+    ctx.fillStyle = color;
+    const bodyY = Math.min(y(open), y(close));
+    const bodyH = Math.max(2, Math.abs(y(open) - y(close)));
+
+    ctx.fillRect(x - candleWidth / 2, bodyY,
+      candleWidth, bodyH);
+
+    previous = close;
+  }
+
+  const labels = ["Start", "25%", "50%", "75%", "Now"];
+  ctx.fillStyle = "#8b9bb2";
+
+  labels.forEach((label, i) => {
+    const x = pad.left + cw * i / 4;
+    ctx.fillText(label, Math.min(x, w - pad.right - 20),
+      h - 6);
+  });
+}
+
+document.getElementById("chartAsset").addEventListener("change", e => {
+  selectedAsset = e.target.value;
+  document.getElementById("tradeAsset").value = selectedAsset;
+  updateDisplay();
+});
+
+document.getElementById("tradeAsset").addEventListener("change", e => {
+  selectedAsset = e.target.value;
+  document.getElementById("chartAsset").value = selectedAsset;
+  updateDisplay();
+});
+
+document.getElementById("quantity").addEventListener("input", updateDisplay);
+
+document.getElementById("buyBtn").addEventListener("click",
+  () => executeTrade("BUY"));
+
+document.getElementById("sellBtn").addEventListener("click",
+  () => executeTrade("SELL"));
+
+document.querySelectorAll("[data-period]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    currentPeriod = btn.dataset.period;
+
+    document.querySelectorAll("[data-period]").forEach(b =>
+      b.classList.toggle("active", b === btn));
+
+    drawChart();
+    toast(currentPeriod + " demo chart selected.");
+  });
+});
+
+document.getElementById("refreshBtn").addEventListener("click", () => {
+  renderMarkets();
+  updateDisplay();
+  toast("Dashboard view refreshed.");
+});
+
+window.addEventListener("resize", drawChart);
+
+renderMarkets();
+renderDashboard();
+updateDisplay();
+</script>
+
+</body>
+</html>
